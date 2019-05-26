@@ -1,3 +1,5 @@
+import java.util.Comparator;
+
 public class MyList<Type> {
 
     private int size;
@@ -10,14 +12,14 @@ public class MyList<Type> {
 
     public void add(Type type) {
         if (size == myType.length) {
-            resize();
+            resize(size * 2);
         }
         myType[size] = type;
         size++;
     }
 
-    private void resize() {
-        Object[] temp = new Object[size * 2];
+    private void resize(int newSize) {
+        Object[] temp = new Object[newSize];
         System.arraycopy(myType, 0, temp, 0, myType.length);
         myType = temp;
     }
@@ -30,6 +32,10 @@ public class MyList<Type> {
                 }
                 myType[size] = 0;
                 size--;
+
+                if (size == myType.length / 4 && size > 0) {
+                    resize(myType.length / 2);
+                }
                 return true;
             }
         }
@@ -70,6 +76,51 @@ public class MyList<Type> {
 
     public int size() {
         return size;
+    }
+
+    private void change(int index1, int index2) {
+        Object t = myType[index1];
+        myType[index1] = myType[index2];
+        myType[index2] = t;
+    }
+
+    private boolean lessen(Type type1, Type type2, Comparator<Type> comp) {
+        return comp.compare(type1, type2) < 0;
+    }
+
+    public void sortSelect(Comparator<Type> comp) {
+        for (int i = 0; i < size - 1; i++) {
+            int min = i;
+            for (int j = i + 1; j < size; j++) {
+                if (lessen((Type) myType[j], (Type) myType[min], comp)) {
+                    min = j;
+                }
+            }
+            change(i, min);
+        }
+    }
+
+    public void sortInsert(Comparator<Type> comp) {
+        for (int i = 0; i < size; i++) {
+            for (int j = i + 1; j < size; j++) {
+                if (lessen((Type) myType[j], (Type) myType[i], comp)) {
+                    change(i, j);
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
+    public void sortBubble(Comparator<Type> comp) {
+        for (int i = size - 1; i > 0; i--) {
+            for (int j = 0; j < i; j++) {
+                if (lessen((Type) myType[j + 1], (Type) myType[j], comp)) {
+                    change(j, j + 1);
+
+                }
+            }
+        }
     }
 
     @Override
